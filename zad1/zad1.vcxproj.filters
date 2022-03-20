@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{1cbadc20-9268-4ee7-b685-99e92809a690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="States">
+      <UniqueIdentifier>{964146d1-2f3c-4da4-a241-029cf453327c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix.cpp">
+      <Filter>Libs</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrify.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="GreetingScreenState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenuState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="User.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixContainer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixManagerState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixCreatorState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectedMatrixState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfirmState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="RenameState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixEditorState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveState.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Matrix.h">
+      <Filter>Libs</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrify.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="GreetingScreenState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenuState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="User.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixContainer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixManagerState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixCreatorState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectedMatrixState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfirmState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="RenameState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixEditorState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveState.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
