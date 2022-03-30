@@ -98,14 +98,14 @@ void RenameState::updateMenu()
 					this->selectedMatrix->name = newName;
 					this->setQuit(true);
 				}
+				quitLoop = true;
 				break;
 			case 2:
 				// Cancel
 				this->setQuit(true);
+				quitLoop = true;
 				break;
 			}
-
-			quitLoop = true;
 		}
 		else if ((95 <= choice && choice <= 122)
 			|| (65 <= choice && choice <= 90)
@@ -121,7 +121,6 @@ void RenameState::updateMenu()
 					this->newName.push_back(choice);
 				quitLoop = true;
 			}
-
 		}
 		else if (choice == 8)
 		{
@@ -139,7 +138,6 @@ void RenameState::updateMenu()
 			// Esc
 			this->setQuit(true);
 			quitLoop = true;
-			break;
 		}
 	}
 }

@@ -3,9 +3,11 @@
 #include<string>
 #include"User.h"
 #include"State.h"
+#include"ErrorState.h"
 #include"ConfirmState.h"
 #include"RenameState.h"
 #include"MatrixEditorState.h"
+#include"MoveState.h"
 
 class SelectedMatrixState : public State
 {

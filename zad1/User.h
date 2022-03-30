@@ -19,10 +19,10 @@ private:
 public:
 	// Accessors
 	std::vector<MatrixContainer*>& getMatrices();
-	int getMaxMatrices();
-	int getnMatrices();
-	int getSelectedId();
-	bool getConfirm();
+	int getMaxMatrices() const;
+	int getnMatrices() const;
+	int getSelectedId() const;
+	bool getConfirm() const;
 
 	// Modifiers
 	void setSelectedId(int id);

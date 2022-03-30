@@ -55,7 +55,7 @@ public:
 	void mul(const int n);
 	void div(const int n);
 
-	std::string string(const int printSize = -1) const;
+	std::string string(const std::string linePrefix = "  ", const int printSize = -1) const;
 	std::string elementString(const int row, const int col, const int printSize = -1) const;
 
 public: 

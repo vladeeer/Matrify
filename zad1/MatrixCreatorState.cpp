@@ -130,7 +130,6 @@ void MatrixCreatorState::updateMenu1()
 				quitLoop = true;
 				break;
 			}
-			break;
 		}
 		else if ((95 <= choice && choice <= 122)
 			|| (65 <= choice && choice <= 90)
@@ -189,10 +188,9 @@ void MatrixCreatorState::updateMenu1()
 		}
 		else if (choice == 27)
 		{
-		// Esc
-		this->setQuit(true);
-		quitLoop = true;
-		break;
+			// Esc
+			this->setQuit(true);
+			quitLoop = true;
 		}
 	}
 }
@@ -276,6 +274,7 @@ void MatrixCreatorState::updateMenu2()
 					if (this->newMatrixHeight != this->newMatrixWidth)
 					{
 						this->states->push(new ErrorState("Matrix Of Ones Must Be A Square Matrix"));
+						quitLoop = true;
 						break;
 					}
 				}
@@ -285,12 +284,14 @@ void MatrixCreatorState::updateMenu2()
 					if (this->cloneId == -1)
 					{
 						this->states->push(new ErrorState("No Matrix " + this->cloneOf + " Found"));
+						quitLoop = true;
 						break;
 					}
 					else if (this->user->getMatrices()[this->cloneId]->matrix->getWidth() != this->newMatrixWidth
 						|| this->user->getMatrices()[this->cloneId]->matrix->getHeight() != this->newMatrixHeight)
 					{
 						this->states->push(new ErrorState("Clone Matrix Must Be Of The Same Size As Original"));
+						quitLoop = true;
 						break;
 					}
 				} 
@@ -304,16 +305,14 @@ void MatrixCreatorState::updateMenu2()
 				quitLoop = true;
 				break;
 			}
-			break;
 		}
 		else if ((95 <= choice && choice <= 122)
 			|| (65 <= choice && choice <= 90)
 			|| (48 <= choice && choice <= 57))
 		{
 			// _'Aa1
-			switch (this->getSelectedOption())
+			if (this->getSelectedOption() == 2)
 			{
-			case 2:
 				// Clone Of
 				this->initMode = 2;
 				this->zeroMatrix = false;
@@ -323,15 +322,13 @@ void MatrixCreatorState::updateMenu2()
 				else
 					this->cloneOf.push_back(choice);
 				quitLoop = true;
-				break;
 			}
 		}
 		else if (choice == 8)
 		{
 			// Backspace
-			switch (this->getSelectedOption())
+			if (this->getSelectedOption() == 2)
 			{
-			case 2:
 				// Clone Of
 				this->initMode = 2;
 				this->zeroMatrix = false;
@@ -339,15 +336,13 @@ void MatrixCreatorState::updateMenu2()
 				if (!this->cloneOf.empty())
 					this->cloneOf.pop_back();
 				quitLoop = true;
-				break;
 			}
 		}
 		else if (choice == 27)
 		{
-		// Esc
-		this->nextStage = false;
-		quitLoop = true;
-		break;
+			// Esc
+			this->nextStage = false;
+			quitLoop = true;
 		}
 	}
 }

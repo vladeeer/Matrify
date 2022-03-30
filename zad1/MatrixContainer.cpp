@@ -23,6 +23,19 @@ MatrixContainer::MatrixContainer(double* arr, int height,
 	this->matrix->initWithArray(arr);
 }
 
+MatrixContainer::MatrixContainer(MatrixContainer& m)
+	: MatrixContainer(m.matrix->getHeight(), m.matrix->getWidth(), m.name)
+{
+	this->matrix->initWithMatrix(*m.matrix);
+}
+
+MatrixContainer::MatrixContainer()
+{
+	this->matrix = new Matrix<double>(1, 1);
+	this->matrix->initWithZeros();
+	this->name = "Empty";
+}
+
 MatrixContainer::~MatrixContainer()
 {
 	delete this->matrix;

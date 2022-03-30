@@ -85,7 +85,6 @@ void ConfirmState::updateMenu()
 			this->user->cancel();
 			this->setQuit(true);
 			quitLoop = true;
-			break;
 		}
 	}
 }

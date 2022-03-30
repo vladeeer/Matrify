@@ -71,14 +71,14 @@ template<typename T>
 int Matrix<T>::determineStrLength(T a) const
 {
 	std::string s = std::to_string(a);
-	int l = s.length();
+	int l = (int)s.length();
 
 	if (s.find(".") != std::string::npos)
 	{
-		while (s[l - 1] == '0')
+		while (s[l - 1LL] == '0')
 		{
 			l--;
-			if (s[l - 1] == '.')
+			if (s[l - 1LL] == '.')
 			{
 				l--;
 				break;
@@ -120,7 +120,7 @@ template<typename T>
 T* Matrix<T>::getRow(const int row) const
 {
 	// Returns pointer to selected row
-	return this->arr + row * width;
+	return this->arr + ((long long)row * this->width);
 }
 
 template<typename T>
@@ -198,6 +198,7 @@ void Matrix<T>::initWithMatrix(const Matrix& m)
 	this->initWithArray(m.getArr());
 }
 
+// Modifiers
 template<typename T>
 void Matrix<T>::set(const int row, const int col, const T val)
 {
@@ -296,7 +297,7 @@ void Matrix<T>::div(const int n)
 }
 
 template<typename T>
-std::string Matrix<T>::string(const int printSize) const
+std::string Matrix<T>::string(const std::string linePrefix, const int printSize) const
 {
 	// Printable result
 	std::stringstream ss;		 
@@ -332,14 +333,14 @@ std::string Matrix<T>::string(const int printSize) const
 		// / 0 1 \    
 		// | 2 3 |
 		// \ 4 5 /
-		ss << "  / " << this->arrToStr(this->getRow(0), this->width, maxPrintSize)
+		ss << linePrefix << "/ " << this->arrToStr(this->getRow(0), this->width, maxPrintSize)
 			<< " \\" << "\n";
 		for (int j = 1; j < this->height-1; j++)
 		{
-			ss << "  | " << this->arrToStr(this->getRow(j), this->width, maxPrintSize)
+			ss << linePrefix << "| " << this->arrToStr(this->getRow(j), this->width, maxPrintSize)
 				<< " |" << "\n";
 		}
-		ss << "  \\ " << this->arrToStr(this->getRow(this->height-1), this->width, maxPrintSize)
+		ss << linePrefix << "\\ " << this->arrToStr(this->getRow(this->height-1), this->width, maxPrintSize)
 			<< " /" << "\n";
 	}
 	return ss.str();

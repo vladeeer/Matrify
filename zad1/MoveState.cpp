@@ -1,61 +1,49 @@
-#include "MatrixManagerState.h"
+#include "MoveState.h"
 
 // Constructors/Destructors
-MatrixManagerState::MatrixManagerState(
+MoveState::MoveState(
 	std::stack<State*>* states, User* user) : State()
 {
 	this->states = states;
 	this->user = user;
+
+	this->setTotalOptions(3);
 }
 
-MatrixManagerState::~MatrixManagerState()
+MoveState::~MoveState()
 {
 }
 
-void MatrixManagerState::printMenu()
+void MoveState::printMenu()
 {
 	system("CLS");
 
 	std::stringstream ss;
 
-	this->setTotalOptions(this->user->getnMatrices() + 2);
+	ss << " <========   Move Matrix   ========>" << "\n" << "\n";
 
-	ss << " <======== Matrix Manager ========>" << "\n" << "\n";
+	std::string options[3];
+	options[0] = "Move Up";
+	options[1] = "Move Down";
+	options[2] = "Back";
+ 
+	ss << "------------------------------------" << "\n";
 
-	std::vector<std::string> options(this->user->getMaxMatrices() + 2);
-	options[this->user->getMaxMatrices()] = "Create New Matrix";
-	options[this->user->getMaxMatrices() + 1] = "Back To Main Menu";
+	for (int i = 0; i < this->user->getnMatrices(); i++)
+		ss << ((i == this->user->getSelectedId()) ? "  > " : "    ")
+		<< std::to_string(i) << ". " << this->user->getMatrices()[i]->name << " "
+		<< std::to_string(this->user->getMatrices()[i]->matrix->getHeight()) << "x"
+		<< std::to_string(this->user->getMatrices()[i]->matrix->getWidth()) << "\n";
+	
+	ss << "------------------------------------" << "\n" << "\n";
 
-	if (this->user->getnMatrices() > 0)
-	{
-		for (int i = 0; i < this->user->getnMatrices(); i++)
-		{
-			options[i] = std::to_string(i) + ". "
-				+ this->user->getMatrices()[i]->name + " "
-				+ std::to_string(this->user->getMatrices()[i]->matrix->getHeight()) + "x"
-				+ std::to_string(this->user->getMatrices()[i]->matrix->getWidth());
-		}
 
-		ss << " " << std::to_string(this->user->getnMatrices())
-			<< "/" << std::to_string(this->user->getMaxMatrices())
-			<< " Matrices Stored" << "\n" << "\n";
-
-		ss << "-----------------------------------" << "\n";
-
-		ss << getOptionsString(options.data(), this->user->getnMatrices());
-
-		ss << "-----------------------------------" << "\n" << "\n";
-	}
-	else
-	{
-		ss << " No Matrices Stored" << " \n" << "\n";
-	}
-	ss << getOptionsString(options.data() + this->user->getMaxMatrices(), 2, this->user->getnMatrices()) << "\n"; // New, Quit
+	ss << getOptionsString(options, 3); // New, Quit
 
 	std::cout << ss.str();
 }
 
-void MatrixManagerState::updateMenu()
+void MoveState::updateMenu()
 {
 	bool quitLoop = false;
 	int choice = 0;
@@ -83,25 +71,32 @@ void MatrixManagerState::updateMenu()
 		else if (choice == 13)
 		{
 			// Enter
-			int selectedOption = this->getSelectedOption();
-
-			if (selectedOption < this->user->getnMatrices())
+			switch (this->getSelectedOption())
 			{
-				this->user->setSelectedId(selectedOption);
-				this->states->push(new SelectedMatrixState(this->states, this->user));
-			}
-			else if (selectedOption == this->user->getnMatrices())
-			{
-				// Open Matrix Creator
-				if (this->user->getnMatrices() < this->user->getMaxMatrices())
-					this->states->push(new MatrixCreatorState(this->states, this->user));
-				else
-					this->states->push(new ErrorState("Maximun Amount Of Stored Matrices Reached"));
-			}
-			else
-			{
-				// Quit
+			case 0:
+				// Move Up
+				if (this->user->getSelectedId() > 0)
+				{
+					MatrixContainer* tempMatrixPtr = this->user->getMatrices()[this->user->getSelectedId()];
+					this->user->getMatrices()[this->user->getSelectedId()] = this->user->getMatrices()[this->user->getSelectedId() - 1LL];
+					this->user->getMatrices()[this->user->getSelectedId() - 1LL] = tempMatrixPtr;
+					this->user->setSelectedId(this->user->getSelectedId() - 1);
+				}
+				break;
+			case 1:
+				// Move Down
+				if (this->user->getSelectedId() < this->user->getnMatrices() - 1)
+				{
+					MatrixContainer* tempMatrixPtr = this->user->getMatrices()[this->user->getSelectedId()];
+					this->user->getMatrices()[this->user->getSelectedId()] = this->user->getMatrices()[this->user->getSelectedId() + 1LL];
+					this->user->getMatrices()[this->user->getSelectedId() + 1LL] = tempMatrixPtr;
+					this->user->setSelectedId(this->user->getSelectedId() + 1);
+				}
+				break;
+			case 2:
+				// Back
 				this->setQuit(true);
+				break;
 			}
 
 			quitLoop = true;
@@ -112,12 +107,11 @@ void MatrixManagerState::updateMenu()
 			// Esc
 			this->setQuit(true);
 			quitLoop = true;
-			break;
 		}
 	}
 }
 
-void MatrixManagerState::update()
+void MoveState::update()
 {
 	this->printMenu();
 	this->updateMenu();
