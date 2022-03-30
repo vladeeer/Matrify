@@ -22,6 +22,8 @@ private:
 
 public:
 	// Functions
+	bool isIn(const char& a, const std::string& s) const;
+
 	void printMenu() const;
 	void updateMenu();
 	void update();

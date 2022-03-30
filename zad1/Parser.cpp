@@ -7,8 +7,10 @@ Parser::Parser(User* user, std::string expression)
 {
 	this->user = user;
 
-	this->expression = expression.c_str();
-	this->currentChar = this->expression;
+	this->parsingState = ParsingState::LEXING;
+
+	this->expression = expression;
+	this->charIter = 0;
 }
 
 Parser::~Parser()
@@ -28,18 +30,93 @@ int Parser::findMatrix(std::string& name) const
 	return -1;
 }
 
+bool Parser::isIn(const char& a, const std::string& s) const
+{
+	for (int i = 0; i < s.length(); i++)
+		if (s[i] == a)
+			return true;
+	return false;
+}
+
 void Parser::nextChar()
 {
-	currentChar++;
+	if (this->charIter < this->expression.length() - 1)
+		charIter++;
+	else 
+		this->parsingState = ParsingState::PARSING;
+}
+
+void Parser::createWordToken()
+{
+	std::string s = "";
+
+	while (!this->isIn(this->expression[this->charIter], this->operators)
+		&& this->expression[this->charIter] != ' '
+		&& this->parsingState == ParsingState::LEXING)
+	{
+		s.push_back(this->expression[this->charIter]);
+		this->nextChar();
+	}
+	
+	for (int i = 0; i < this->functions.size(); i++)
+	{
+		if (s == this->functions[i])
+		{
+			this->tokens.push_back(new Token(Tokens::FID));
+			this->tokens.back()->sValue = s;
+			return;
+		}
+	}
+	
+	this->tokens.push_back(new Token(Tokens::MID));
+	this->tokens.back()->sValue = s;
 }
 
 void Parser::createTokens()
 {
-	while ((*this->currentChar) != 0)
+	while (this->parsingState == ParsingState::LEXING)
 	{
-		if ((*this->currentChar) >= 48 && (*this->currentChar) <= 57)
-			std::cout << (*this->currentChar);
-		this->nextChar();
+		if (this->expression[this->charIter] == ' ')
+			this->nextChar();
+		else if ((95 <= this->expression[this->charIter] && this->expression[this->charIter] <= 122)
+			|| (65 <= this->expression[this->charIter] && this->expression[this->charIter] <= 90))
+			this->createWordToken();
+		else if (this->expression[this->charIter] == '+')
+		{
+			this->tokens.push_back(new Token(Tokens::ADD));
+			this->nextChar();
+		}
+		else if (this->expression[this->charIter] == '-')
+		{
+			this->tokens.push_back(new Token(Tokens::SUB));
+			this->nextChar();
+		}
+		else if (this->expression[this->charIter] == '*')
+		{
+			this->tokens.push_back(new Token(Tokens::MUL));
+			this->nextChar();
+		}
+		else if (this->expression[this->charIter] == '/')
+		{
+			this->tokens.push_back(new Token(Tokens::DIV));
+			this->nextChar();
+		}
+		else if (this->expression[this->charIter] == '^')
+		{
+			this->tokens.push_back(new Token(Tokens::POW));
+			this->nextChar();
+		}
+		else if (this->expression[this->charIter] == '(')
+		{
+			this->tokens.push_back(new Token(Tokens::OPP));
+			this->nextChar();
+		}
+		else if (this->expression[this->charIter] == ')')
+		{
+			this->tokens.push_back(new Token(Tokens::CLP));
+			this->nextChar();
+		}
+			;// ERROR: UNRESOLVED SYMBOL
 	}
 }
 
@@ -47,5 +124,9 @@ void Parser::createTokens()
 void Parser::parse()
 {
 	createTokens();
+	for (int i = 0; i < this->tokens.size(); i++)
+	{
+		std::cout << this->tokens[i]->string();
+	}
 }
  

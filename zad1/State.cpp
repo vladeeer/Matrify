@@ -1,8 +1,6 @@
 #include "State.h"
 
-// Base State Class
-// Cannot be Initialized
-// Made only to be inherited
+// Abstract Base State Class
 
 // Constructors/Destructors
 State::State()

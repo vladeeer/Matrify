@@ -14,6 +14,14 @@ EvalState::~EvalState()
 {
 }
 
+bool EvalState::isIn(const char& a, const std::string& s) const
+{
+	for (int i = 0; i < s.length(); i++)
+		if (s[i] == a)
+			return true;
+	return false;
+}
+
 void EvalState::printMenu() const
 {
 	system("CLS");
@@ -58,10 +66,13 @@ void EvalState::updateMenu()
 			Parser parser(this->user, this->expression);
 			parser.parse();
 			system("PAUSE");
+			quitLoop = true;
 		}
 		else if ((95 <= choice && choice <= 122)
 			|| (65 <= choice && choice <= 90)
-			|| (48 <= choice && choice <= 57))
+			|| (48 <= choice && choice <= 57)
+			|| choice == 32
+			|| this->isIn(choice, "+-*/^()"))
 		{
 			// _'Aa1
 			switch (this->getSelectedOption())

@@ -123,6 +123,7 @@ void SelectedMatrixState::update()
 		this->lastQuery = "";
 		if (this->user->getConfirm())
 		{
+			delete this->user->getMatrices()[this->user->getSelectedId()];
 			this->user->getMatrices().erase(this->user->getMatrices().begin()
 				+ this->user->getSelectedId());
 			this->setQuit(true);

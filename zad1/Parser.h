@@ -13,18 +13,29 @@ public:
 
 private:
 	// Variables
-	User* user;
+	enum class ParsingState
+	{
+		LEXING,
+		PARSING
+	};
 
-	const char* expression;
+	User* user;
+	ParsingState parsingState;
+
+	std::string expression;
 	std::vector<Token*> tokens;
 
-	const char* currentChar;
+	int charIter;
+
+	const std::string operators = "+-*/^()";
+	const std::vector<std::string> functions = { "sin", "cos", "abs" };
 
 	// Functions
 	int findMatrix(std::string& name) const;
-	
+	bool isIn(const char& a, const std::string& s) const;
 
 	void nextChar();
+	void createWordToken();
 	void createTokens();
 
 public:

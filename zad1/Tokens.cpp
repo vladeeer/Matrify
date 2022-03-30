@@ -11,7 +11,8 @@ Token::Token(Tokens type)
 	switch (this->type)
 	{
 	case Tokens::ADD:
-
+		this->name = "+";
+		break;
 	case Tokens::SUB:
 		this->name = "-";
 		break;
@@ -20,6 +21,9 @@ Token::Token(Tokens type)
 		break;
 	case Tokens::DIV:
 		this->name = "/";
+		break;
+	case Tokens::POW:
+		this->name = "^";
 		break;
 	case Tokens::OPP:
 		this->name = "(";
@@ -52,5 +56,5 @@ Token::~Token()
 // Functions
 std::string Token::string() const
 {
-	return this->name + ((isString) ? (":" + sValue) : "") + ((isDouble) ? (":" + std::to_string(dValue)) : "");
+	return this->name + ((isString) ? (":" + sValue) : "") + ((isDouble) ? (":" + std::to_string(dValue)) : "") + " ";
 }

@@ -7,6 +7,7 @@ enum class Tokens
 	SUB,
 	MUL,
 	DIV,
+	POW,
 	OPP,
 	CLP,
 	VAL,
