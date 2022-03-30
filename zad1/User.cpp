@@ -27,22 +27,22 @@ std::vector<MatrixContainer*>& User::getMatrices()
 	return this->matrices;
 }
 
-int User::getMaxMatrices()
+int User::getMaxMatrices() const
 {
 	return this->nMaxMatrices;
 }
 
-int User::getnMatrices()
+int User::getnMatrices() const
 {
-	return this->matrices.size();
+	return (int)this->matrices.size();
 }
 
-int User::getSelectedId()
+int User::getSelectedId() const
 {
 	return this->selectedId;
 }
 
-bool User::getConfirm()
+bool User::getConfirm() const
 {
 	return this->bConfirm;
 }

@@ -3,23 +3,22 @@
 #include<string>
 #include"User.h"
 #include"State.h"
-#include"EvalState.h"
-#include"MatrixManagerState.h"
-#include"confirmState.h"
+#include"ErrorState.h"
+#include"Parser.h"
 
-class MainMenuState : public State
+class EvalState : public State
 {
 public:
 	// Constructors/Destructors
-	MainMenuState(std::stack<State*>* states, User* user);
-	~MainMenuState();
+	EvalState(std::stack<State*>* states, User* user);
+	~EvalState();
 
 private:
 	// Variables
 	std::stack<State*>* states;
 	User* user;
 
-	std::string lastQuery;
+	std::string expression;
 
 public:
 	// Functions
@@ -27,4 +26,3 @@ public:
 	void updateMenu();
 	void update();
 };
-

@@ -13,6 +13,8 @@ public:
 		std::string name);
 	MatrixContainer(double* arr, int height, int width,
 		std::string name);
+	MatrixContainer(MatrixContainer& m);
+	MatrixContainer();
 	~MatrixContainer();
 
 public:

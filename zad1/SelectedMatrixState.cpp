@@ -85,6 +85,12 @@ void SelectedMatrixState::updateMenu()
 				break;
 			case 2:
 				// Move
+				if (this->user->getnMatrices() == 1)
+				{
+					this->states->push(new ErrorState("Not Enough Matrices To Move"));
+					break;
+				}
+				this->states->push(new MoveState(this->states, this->user));
 				break;
 			case 3:
 				// Delete
@@ -106,7 +112,6 @@ void SelectedMatrixState::updateMenu()
 			// Esc
 			this->setQuit(true);
 			quitLoop = true;
-			break;
 		}
 	}
 }

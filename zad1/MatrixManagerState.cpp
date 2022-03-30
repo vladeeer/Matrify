@@ -22,9 +22,9 @@ void MatrixManagerState::printMenu()
 
 	ss << " <======== Matrix Manager ========>" << "\n" << "\n";
 
-	std::vector<std::string> options(this->user->getMaxMatrices()+2);
+	std::vector<std::string> options(this->user->getMaxMatrices()+2LL);
 	options[this->user->getMaxMatrices()] = "Create New Matrix"; 
-	options[this->user->getMaxMatrices()+1] = "Back To Main Menu";
+	options[this->user->getMaxMatrices()+1LL] = "Back To Main Menu";
 	
 	if (this->user->getnMatrices() > 0)
 	{
@@ -50,7 +50,7 @@ void MatrixManagerState::printMenu()
 	{
 		ss << " No Matrices Stored" << " \n" << "\n";
 	}
-	ss << getOptionsString(options.data() + this->user->getMaxMatrices(), 2, this->user->getnMatrices()) << "\n"; // New, Quit
+	ss << getOptionsString(options.data() + this->user->getMaxMatrices(), 2, this->user->getnMatrices()); // New, Quit
 
 	std::cout << ss.str();
 }
@@ -105,14 +105,12 @@ void MatrixManagerState::updateMenu()
 			}
 
 			quitLoop = true;
-			break;
 		}
 		else if (choice == 27)
 		{
 			// Esc
 			this->setQuit(true);
 			quitLoop = true;
-			break;
 		}
 	}
 }

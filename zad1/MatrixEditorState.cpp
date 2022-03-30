@@ -15,6 +15,8 @@ MatrixEditorState::MatrixEditorState(
 
 	this->currentString = this->selectedMatrix->matrix->elementString(0, 0);
 	this->removeTailSpaces(this->currentString);
+
+	this->setTotalOptions(this->selectedMatrix->matrix->getHeight() + 2);
 }
 
 MatrixEditorState::~MatrixEditorState()
@@ -52,19 +54,15 @@ void MatrixEditorState::printMenu()
 
 	std::stringstream ss;
 
-	this->setTotalOptions(this->selectedMatrix->matrix->getHeight() + 2);
-
-	ss << " " << this->currentString << "_" << "\n\n";
-
 	ss << " <========  Matrix Editor  ========>" << "\n" << "\n";
 
 	std::string matrix = this->selectedMatrix->matrix->string();
 
-	int length = this->selectedMatrix->matrix->elementString(0, 0).length();
+	int length = (int)this->selectedMatrix->matrix->elementString(0, 0).length();
 	if (this->getSelectedOption() < this->selectedMatrix->matrix->getHeight())
-		matrix[3 + this->getSelectedOption() *
-		(6 + this->selectedMatrix->matrix->getWidth() * (1 + length))
-		+ this->selectedCol * (length + 1)] = '>';
+		matrix[3LL + this->getSelectedOption() *
+		(6 + this->selectedMatrix->matrix->getWidth() * (1LL + length))
+		+ this->selectedCol * (length + 1LL)] = '>';
 
 	ss << matrix << "\n";
 
@@ -78,7 +76,7 @@ void MatrixEditorState::printMenu()
 		+ std::to_string(this->selectedMatrix->matrix->getHeight()) + "x"
 		+ std::to_string(this->selectedMatrix->matrix->getWidth()) << "\n" << "\n";
 
-	ss << getOptionsString(options, 2, this->selectedMatrix->matrix->getHeight()) << "\n"; // New, Quit
+	ss << getOptionsString(options, 2, this->selectedMatrix->matrix->getHeight()); // New, Quit
 
 	std::cout << ss.str();
 }
@@ -103,18 +101,24 @@ void MatrixEditorState::updateMenu()
 			case 80:
 				// Down Arrow
 				this->nextOption();
+				if (this->getSelectedOption() > this->selectedMatrix->matrix->getHeight() - 1)
+					this->selectedCol = 0;
 				break;
 			case 72:
 				// Up Arrow
 				this->previousOption();
+				if (this->getSelectedOption() > this->selectedMatrix->matrix->getHeight() - 1)
+					this->selectedCol = 0;
 				break;
 			case 75:
 				// Left Arrow
-				this->previousCol();
+				if (this->getSelectedOption() < this->selectedMatrix->matrix->getHeight())
+					this->previousCol();
 				break;
 			case 77:
 				// Right Arrow
-				this->nextCol();
+				if (this->getSelectedOption() < this->selectedMatrix->matrix->getHeight())
+					this->nextCol();
 				break;	
 			}
 			if (choice2 == 72 || choice2 == 75 || choice2 == 77 || choice2 == 80)
@@ -141,17 +145,16 @@ void MatrixEditorState::updateMenu()
 			{
 				// Clear Matrix
 				this->selectedMatrix->matrix->initWithZeros();
+				quitLoop = true;
 			}
 			else if (selectedOption == this->selectedMatrix->matrix->getHeight() + 1)
 			{
 				// Back
 				this->setQuit(true);
+				quitLoop = true;
 			}
-
-			quitLoop = true;
-			break;
 		}
-		if (48 <= choice && choice <= 57)
+		else if (48 <= choice && choice <= 57)
 		{
 			// 123
 			if (this->getSelectedOption() < this->selectedMatrix->matrix->getHeight())
@@ -160,11 +163,21 @@ void MatrixEditorState::updateMenu()
 		}
 		else if (choice == 44 || choice == 46)
 		{
+			// '.'
 			if (this->currentString.find('.') == std::string::npos)
 			{
 				this->currentString.push_back('.');
 				quitLoop = true;
 			}
+		}
+		else if (choice == 45)
+		{
+			// '-'
+			if (this->currentString[0] == '-')
+				this->currentString.erase(0, 1);
+			else
+				this->currentString.insert(0, "-");
+			quitLoop = true;
 		}
 		else if (choice == 8)
 		{
@@ -180,13 +193,25 @@ void MatrixEditorState::updateMenu()
 			// Esc
 			this->setQuit(true);
 			quitLoop = true;
-			break;
 		}
 	}
 	if (this->getSelectedOption() < this->selectedMatrix->matrix->getHeight())
 	{
-		if (this->currentString.empty() || this->currentString == ".")
+		if (this->currentString == "-.")
+		{
 			this->selectedMatrix->matrix->set(this->getSelectedOption(), this->selectedCol, 0);
+			this->currentString = "-0.";
+		}
+		else if (this->currentString.empty() || this->currentString == "-")
+		{
+			this->selectedMatrix->matrix->set(this->getSelectedOption(), this->selectedCol, 0);
+			this->currentString = "0";
+		}
+		else if (this->currentString == ".")
+		{
+			this->selectedMatrix->matrix->set(this->getSelectedOption(), this->selectedCol, 0);
+			this->currentString = "0.";
+		}
 		else
 			this->selectedMatrix->matrix->set(this->getSelectedOption(), this->selectedCol, std::stod(this->currentString));
 	}

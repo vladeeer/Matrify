@@ -3,15 +3,14 @@
 #include<string>
 #include"User.h"
 #include"State.h"
-#include"MatrixCreatorState.h"
-#include"SelectedMatrixState.h"
+#include"MatrixContainer.h"
 
-class MatrixManagerState : public State
+class MoveState : public State
 {
 public:
 	// Constructors/Destructors
-	MatrixManagerState(std::stack<State*>* states, User* user);
-	~MatrixManagerState();
+	MoveState(std::stack<State*>* states, User* user);
+	~MoveState();
 
 private:
 	// Variables

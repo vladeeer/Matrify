@@ -60,6 +60,8 @@ void MainMenuState::updateMenu()
 			switch (this->getSelectedOption())
 			{
 			case 0:
+				// Evaluate Expression
+				this->states->push(new EvalState(this->states, this->user));
 				break;
 			case 1:
 				// Manage Stored Matrices
@@ -74,7 +76,6 @@ void MainMenuState::updateMenu()
 				break;
 			}
 			quitLoop = true;
-			break;
 		}
 		else if (choice == 27)
 		{
@@ -82,7 +83,6 @@ void MainMenuState::updateMenu()
 			this->states->push(new ConfirmState(this->user, "Are You Sure You Want To Quit?", "Leave", "Stay"));
 			this->lastQuery = "Quit";
 			quitLoop = true;
-			break;
 		}
 	}
 }
