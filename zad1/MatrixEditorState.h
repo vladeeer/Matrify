@@ -4,6 +4,7 @@
 #include"User.h"
 #include"State.h"
 #include"MatrixContainer.h"
+#include"ConfirmState.h"
 
 class MatrixEditorState : public State
 {
@@ -24,6 +25,8 @@ private:
 	int lastCol;
 
 	std::string currentString;
+
+	std::string lastQuery;
 
 public:
 	// Functions

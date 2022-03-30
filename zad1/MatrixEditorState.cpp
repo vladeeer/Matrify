@@ -17,6 +17,8 @@ MatrixEditorState::MatrixEditorState(
 	this->removeTailSpaces(this->currentString);
 
 	this->setTotalOptions(this->selectedMatrix->matrix->getHeight() + 2);
+
+	this->lastQuery = "";
 }
 
 MatrixEditorState::~MatrixEditorState()
@@ -144,7 +146,9 @@ void MatrixEditorState::updateMenu()
 			if (selectedOption == this->selectedMatrix->matrix->getHeight())
 			{
 				// Clear Matrix
-				this->selectedMatrix->matrix->initWithZeros();
+				this->lastQuery = "Clear";
+				this->states->push(new ConfirmState(this->user, "Matrix "
+					+ this->selectedMatrix->name + " Will Be Cleared", "Ok", "Cancel"));
 				quitLoop = true;
 			}
 			else if (selectedOption == this->selectedMatrix->matrix->getHeight() + 1)
@@ -219,6 +223,15 @@ void MatrixEditorState::updateMenu()
 
 void MatrixEditorState::update()
 {
-	this->printMenu();
-	this->updateMenu();
+	if (this->lastQuery == "Clear")
+	{
+		this->lastQuery = "";
+		if (this->user->getConfirm())
+			this->selectedMatrix->matrix->initWithZeros();
+	}
+	else
+	{
+		this->printMenu();
+		this->updateMenu();
+	}
 }

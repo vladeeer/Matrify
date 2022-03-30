@@ -7,7 +7,7 @@ EvalState::EvalState(
 	this->states = states;
 	this->user = user;
 
-	this->expression = "None";
+	this->expression = "";
 }
 
 EvalState::~EvalState()
@@ -28,7 +28,7 @@ void EvalState::printMenu() const
 
 	std::stringstream ss;
 
-	ss << " <======== Matrix Creator ========>" << "\n" << "\n";
+	ss <<  " <======== Evaluate  ========>" << "\n" << "\n";
 
 	ss << " : " << this->expression << "\n";
 
@@ -63,9 +63,10 @@ void EvalState::updateMenu()
 		else if (choice == 13)
 		{
 			// Enter
-			Parser parser(this->user, this->expression);
+			Parser parser(this->states, this->user, this->expression);
 			parser.parse();
-			system("PAUSE");
+			if (parser.parsingState != Parser::ParsingState::ERROR)
+				system("PAUSE");
 			quitLoop = true;
 		}
 		else if ((95 <= choice && choice <= 122)
@@ -74,31 +75,22 @@ void EvalState::updateMenu()
 			|| choice == 32
 			|| this->isIn(choice, "+-*/^()"))
 		{
-			// _'Aa1
-			switch (this->getSelectedOption())
-			{
-			case 0:
-				// Name
-				if (this->expression == "None")
-					this->expression = choice;
-				else
-					this->expression.push_back(choice);
-				quitLoop = true;
-				break;
-			}
+			// _Aa1
+			this->expression.push_back(choice);
+			quitLoop = true;
+		}
+		else if (choice == 44 || choice == 46)
+		{
+			// .,
+			this->expression.push_back('.');
+			quitLoop = true;
 		}
 		else if (choice == 8)
 		{
 			// Backspace
-			switch (this->getSelectedOption())
-			{
-			case 0:
-				// Name
-				if (!this->expression.empty())
-					this->expression.pop_back();
-				quitLoop = true;
-				break;
-			}
+			if (!this->expression.empty())
+				this->expression.pop_back();
+			quitLoop = true;
 		}
 		else if (choice == 27)
 		{
