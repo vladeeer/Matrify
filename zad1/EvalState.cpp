@@ -7,7 +7,8 @@ EvalState::EvalState(
 	this->states = states;
 	this->user = user;
 
-	this->expression = "";
+	this->expression = "3+4*2/(1-5)^2^3";
+	this->cursorPos = 0;
 }
 
 EvalState::~EvalState()
@@ -31,6 +32,15 @@ void EvalState::printMenu() const
 	ss <<  " <======== Evaluate  ========>" << "\n" << "\n";
 
 	ss << " : " << this->expression << "\n";
+
+	std::string cursorLine;
+	if (!this->expression.empty())
+	{
+		cursorLine.resize(3 + this->expression.length() + 1, ' ');
+		cursorLine[3LL + this->cursorPos] = '^';
+	}
+	cursorLine.append("\n");
+	ss << cursorLine;
 
 	std::cout << ss.str();
 }
@@ -58,15 +68,29 @@ void EvalState::updateMenu()
 				this->previousOption();
 				quitLoop = true;
 				break;
+			case 75:
+				// Left Arrow
+				if (!this->expression.empty() && (this->cursorPos > 0))
+					this->cursorPos--;
+				quitLoop = true;
+				break;
+			case 77:
+				// Right Arrow
+				if (!this->expression.empty() && this->cursorPos < this->expression.length())
+					this->cursorPos++;
+				quitLoop = true;
+				break;
 			}
 		}
 		else if (choice == 13)
 		{
 			// Enter
-			Parser parser(this->states, this->user, this->expression);
+			Parser parser(this->user, this->expression);
 			parser.parse();
-			if (parser.parsingState != Parser::ParsingState::ERROR)
+			if (!parser.error())
 				system("PAUSE");
+			else
+				this->states->push(new ErrorState(parser.getError()));
 			quitLoop = true;
 		}
 		else if ((95 <= choice && choice <= 122)
@@ -76,20 +100,28 @@ void EvalState::updateMenu()
 			|| this->isIn(choice, "+-*/^()"))
 		{
 			// _Aa1
-			this->expression.push_back(choice);
+			this->expression.insert(this->cursorPos, 1, choice);
+			this->cursorPos++;
 			quitLoop = true;
 		}
 		else if (choice == 44 || choice == 46)
 		{
 			// .,
-			this->expression.push_back('.');
+			this->expression.insert(this->cursorPos, 1, '.');
+			this->cursorPos++;
 			quitLoop = true;
 		}
 		else if (choice == 8)
 		{
 			// Backspace
 			if (!this->expression.empty())
-				this->expression.pop_back();
+			{
+				if (this->cursorPos > 0)
+				{
+					this->expression.erase(this->cursorPos - 1LL, 1);
+					this->cursorPos--;
+				}
+			}
 			quitLoop = true;
 		}
 		else if (choice == 27)
@@ -99,6 +131,8 @@ void EvalState::updateMenu()
 			quitLoop = true;
 		}
 	}
+	if (this->expression.empty())
+		this->expression = " ";
 }
 
 void EvalState::update()

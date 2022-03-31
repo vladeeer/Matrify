@@ -1,57 +1,63 @@
 #pragma once
+#include<iostream>
 #include<stack>
 #include<string>
 #include<vector>
-#include"State.h"
 #include"User.h"
 #include"Tokens.h"
-#include"ErrorState.h"
 
 class Parser
 {
 public:
 	// Constructors/Destructors
-	Parser(std::stack<State*>* states, User* user, std::string expression);
+	Parser(User* user, std::string expression);
 	~Parser();
 
-public:
+private:
+	User* user;
+
 	// Variables
 	enum class ParsingState
 	{
 		ERROR,
 		LEXING,
+		SHUNTING,
 		PARSING
 	};
 
 	ParsingState parsingState;
 
-private:
-	
+	std::string errorString;
 
-	std::stack<State*>* states;
-	User* user;
-
+	// Lexing
 	std::string expression;
-	std::vector<Token*> tokens;
-
 	int charIter;
-
 	const std::string operators = "+-*/^()";
 	const std::vector<std::string> functions = { "sin", "cos", "abs" };
+	std::vector<Token*> tokens;
+
+	// Shunting
+	std::stack<Token*> opStack;
+	std::deque<Token*> outQueue;
+	int tokenIter;
 
 	// Functions
 	int findMatrix(std::string& name) const;
 	bool isIn(const char& a, const std::string& s) const;
-	void throwError(std::string error);
 
 	void nextChar();
 	void createWordToken();
 	void createValueToken();
 	void createTokens();
 
+	void nextToken();
+	void shuntToQueue();
+
 public:
 	// Functions
 	void parse();
+	bool error();
+	std::string& getError();
 };
 
 
