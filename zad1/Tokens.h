@@ -1,34 +1,39 @@
 #pragma once
 #include<string>
 
-enum class Tokens
-{
-	ADD,
-	SUB,
-	MUL,
-	DIV,
-	OPP,
-	CLP,
-	VAL,
-	MID,
-	FID
-};
-
 class Token
 {
 public:
+	enum class Tokens
+	{
+		ADD,
+		SUB,
+		MUL,
+		DIV,
+		POW,
+		OPP,
+		CLP,
+		COM,
+		VAL,
+		MID,
+		FID
+	};
+
 	// Constructors/Destructors
 	Token(Tokens type);
 	~Token();
 
 	// Variables
+	Tokens type;
+	std::string name;
+
 	bool isString;
 	bool isDouble;
 	std::string sValue;
 	double dValue;
 
-	Tokens type;
-	std::string name;
+	int precedence;
+	bool rightAssociative;
 
 	// Functions
 	std::string string() const;

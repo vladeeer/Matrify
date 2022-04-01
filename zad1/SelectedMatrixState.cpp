@@ -94,7 +94,7 @@ void SelectedMatrixState::updateMenu()
 				break;
 			case 3:
 				// Delete
-				lastQuery = "Delete";
+				this->lastQuery = "Delete";
 				this->states->push(new ConfirmState(this->user, "Matrix " 
 					+ this->selectedMatrix->name + " Will Be Deleted", "Ok", "Cancel"));
 				break;
@@ -123,6 +123,7 @@ void SelectedMatrixState::update()
 		this->lastQuery = "";
 		if (this->user->getConfirm())
 		{
+			delete this->user->getMatrices()[this->user->getSelectedId()];
 			this->user->getMatrices().erase(this->user->getMatrices().begin()
 				+ this->user->getSelectedId());
 			this->setQuit(true);

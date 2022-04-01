@@ -1,4 +1,6 @@
 #pragma once
+#include<iostream>
+#include<stack>
 #include<string>
 #include<vector>
 #include"User.h"
@@ -12,24 +14,50 @@ public:
 	~Parser();
 
 private:
-	// Variables
 	User* user;
 
-	const char* expression;
+	// Variables
+	enum class ParsingState
+	{
+		ERROR,
+		LEXING,
+		SHUNTING,
+		PARSING
+	};
+
+	ParsingState parsingState;
+
+	std::string errorString;
+
+	// Lexing
+	std::string expression;
+	int charIter;
+	const std::string operators = "+-*/^(),";
+	const std::vector<std::string> functions = { "sin", "cos", "abs", "max" };
 	std::vector<Token*> tokens;
 
-	const char* currentChar;
+	// Shunting
+	std::stack<Token*> opStack;
+	std::deque<Token*> outQueue;
+	int tokenIter;
 
 	// Functions
 	int findMatrix(std::string& name) const;
-	
+	bool isIn(const char& a, const std::string& s) const;
 
 	void nextChar();
+	void createWordToken();
+	void createValueToken();
 	void createTokens();
+
+	void nextToken();
+	void shuntToQueue();
 
 public:
 	// Functions
 	void parse();
+	bool error();
+	std::string& getError();
 };
 
 
