@@ -1,7 +1,5 @@
 #include "Parser.h"
 
-// Parser
-
 // Constructors/Destructors
 Parser::Parser(User* user, std::string expression)
 {
@@ -166,11 +164,21 @@ void Parser::createTokens()
 			this->tokens.push_back(new Token(Token::Tokens::CLP));
 			this->nextChar();
 		}
+		else if (this->expression[this->charIter] == ',')
+		{
+			this->tokens.push_back(new Token(Token::Tokens::COM));
+			this->nextChar();
+		}
 		else
 		{
 			this->parsingState = ParsingState::ERROR;
-			this->errorString = "Syntax Error: Unresolved Symbol \"" + std::to_string(this->expression[this->charIter]) + "\" At Col : " + std::to_string(this->charIter);
+			this->errorString = "Syntax Error: Unresolved Symbol \'" + this->expression.substr(this->charIter, 1) + "\' At Col : " + std::to_string(this->charIter);
 		}
+	}
+	if (this->tokens.empty() && this->parsingState != ParsingState::ERROR)
+	{
+		this->parsingState = ParsingState::ERROR;
+		this->errorString = "Syntax Error: Expected Expression";
 	}
 }
 
@@ -197,10 +205,72 @@ void Parser::shuntToQueue()
 			this->opStack.push(this->tokens[this->tokenIter]);
 			this->nextToken();
 		}
+		else if (this->tokens[this->tokenIter]->type == Token::Tokens::COM)
+		{
+			while (!this->opStack.empty() && opStack.top()->type != Token::Tokens::OPP)
+			{
+				this->outQueue.push_back(this->opStack.top());
+				this->opStack.pop();
+				if (this->opStack.empty())
+				{
+					this->parsingState = ParsingState::ERROR;
+					this->errorString = "Syntax Error: Missing Function Parentheses";
+					return;
+				}
+			}
+			this->nextToken();
+		}
+		else if (this->tokens[this->tokenIter]->type == Token::Tokens::ADD
+			|| this->tokens[this->tokenIter]->type == Token::Tokens::SUB
+			|| this->tokens[this->tokenIter]->type == Token::Tokens::MUL
+			|| this->tokens[this->tokenIter]->type == Token::Tokens::DIV
+			|| this->tokens[this->tokenIter]->type == Token::Tokens::POW)
+		{
+			while (!this->opStack.empty() 
+				&& (opStack.top()->precedence > this->tokens[this->tokenIter]->precedence
+				|| (opStack.top()->precedence == this->tokens[this->tokenIter]->precedence
+				&& !this->tokens[this->tokenIter]->rightAssociative)))
+			{
+				this->outQueue.push_back(this->opStack.top());
+				this->opStack.pop();
+			}
+			this->opStack.push(this->tokens[this->tokenIter]);
+			this->nextToken();
+		}
+		else if (this->tokens[this->tokenIter]->type == Token::Tokens::OPP)
+		{
+			this->opStack.push(this->tokens[this->tokenIter]);
+			this->nextToken();
+		}
+		else if (this->tokens[this->tokenIter]->type == Token::Tokens::CLP)
+		{
+			while (!this->opStack.empty() && this->opStack.top()->type != Token::Tokens::OPP)
+			{
+				this->outQueue.push_back(this->opStack.top());
+				this->opStack.pop();
+				if (this->opStack.empty())	
+				{
+					this->parsingState = ParsingState::ERROR;
+					this->errorString = "Syntax Error: Mismatched Parentheses" + this->tokens[this->tokenIter]->string();
+					return;
+				}
+			}
+			this->opStack.pop();
+			if (!this->opStack.empty() && this->opStack.top()->type == Token::Tokens::FID)
+			{
+				this->outQueue.push_back(this->opStack.top());
+				this->opStack.pop();
+			}
+			this->nextToken();
+		}
+		else
+		{
+			this->parsingState = ParsingState::ERROR;
+			this->errorString = "Parsing Error: Invalid Token " + this->tokens[this->tokenIter]->string();
+			return;
+		}
 	}
-	if (this->error())
-		return;
-	else if (opStack.empty())
+	if (opStack.empty())
 		return;
 	else if (opStack.top()->type == Token::Tokens::OPP
 		|| opStack.top()->type == Token::Tokens::CLP)
@@ -220,22 +290,26 @@ void Parser::shuntToQueue()
 void Parser::parse()
 {
 	createTokens();
-	shuntToQueue();
 
-	std::stringstream ss;
-	ss << "\n";
+	std::stringstream s1;
+	s1 << "\n";
 	for (int i = 0; i < this->tokens.size(); i++)
 	{
-		ss << this->tokens[i]->string();
+		s1 << this->tokens[i]->string();
 	}
-	ss << "\n";
-	ss << "Out: ";
+	s1 << "\n";
+	std::cout << s1.str();
+
+	shuntToQueue();
+
+	std::stringstream s2;
+	s2 << "Out: ";
 	for (int i = 0; i < this->outQueue.size(); i++)
 	{
-		ss << this->outQueue[i]->string();
+		s2 << this->outQueue[i]->string();
 	}
-	ss << "\n";
-	std::cout << ss.str();
+	s2 << "\n";
+	std::cout << s2.str();
 }
 
 bool Parser::error()

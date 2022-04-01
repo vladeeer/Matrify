@@ -8,7 +8,7 @@ EvalState::EvalState(
 	this->user = user;
 
 	this->expression = "3+4*2/(1-5)^2^3";
-	this->cursorPos = 0;
+	this->cursorPos = (int)this->expression.length();
 }
 
 EvalState::~EvalState()
@@ -36,9 +36,18 @@ void EvalState::printMenu() const
 	std::string cursorLine;
 	if (!this->expression.empty())
 	{
-		cursorLine.resize(3 + this->expression.length() + 1, ' ');
-		cursorLine[3LL + this->cursorPos] = '^';
+		if (this->expression == " ")
+		{
+			cursorLine.resize(3 + 1, ' ');
+			cursorLine[3] = '^';
+		}
+		else
+		{
+			cursorLine.resize(3 + this->expression.length() + 1, ' ');
+			cursorLine[3LL + this->cursorPos] = '^';
+		}
 	}
+
 	cursorLine.append("\n");
 	ss << cursorLine;
 
@@ -96,18 +105,12 @@ void EvalState::updateMenu()
 		else if ((95 <= choice && choice <= 122)
 			|| (65 <= choice && choice <= 90)
 			|| (48 <= choice && choice <= 57)
+			|| (choice == 44 || choice == 46)
 			|| choice == 32
 			|| this->isIn(choice, "+-*/^()"))
 		{
 			// _Aa1
 			this->expression.insert(this->cursorPos, 1, choice);
-			this->cursorPos++;
-			quitLoop = true;
-		}
-		else if (choice == 44 || choice == 46)
-		{
-			// .,
-			this->expression.insert(this->cursorPos, 1, '.');
 			this->cursorPos++;
 			quitLoop = true;
 		}

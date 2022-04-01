@@ -13,6 +13,7 @@ public:
 		POW,
 		OPP,
 		CLP,
+		COM,
 		VAL,
 		MID,
 		FID

@@ -32,8 +32,8 @@ private:
 	// Lexing
 	std::string expression;
 	int charIter;
-	const std::string operators = "+-*/^()";
-	const std::vector<std::string> functions = { "sin", "cos", "abs" };
+	const std::string operators = "+-*/^(),";
+	const std::vector<std::string> functions = { "sin", "cos", "abs", "max" };
 	std::vector<Token*> tokens;
 
 	// Shunting

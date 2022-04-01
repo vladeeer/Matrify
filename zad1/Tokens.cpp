@@ -43,6 +43,9 @@ Token::Token(Tokens type)
 	case Tokens::CLP:
 		this->name = ")";
 		break;
+	case Tokens::COM:
+		this->name = ",";
+		break;
 	case Tokens::VAL:
 		this->name = "V";
 		this->isDouble = true;
