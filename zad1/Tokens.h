@@ -16,7 +16,8 @@ public:
 		COM,
 		VAL,
 		MID,
-		FID
+		NUL,
+		FID  // WIP
 	};
 
 	// Constructors/Destructors
@@ -36,6 +37,6 @@ public:
 	bool rightAssociative;
 
 	// Functions
-	std::string string() const;
+	std::string string(const bool fullName = false) const;
 };
 

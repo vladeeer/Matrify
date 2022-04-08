@@ -47,15 +47,18 @@ Token::Token(Tokens type)
 		this->name = ",";
 		break;
 	case Tokens::VAL:
-		this->name = "V";
+		this->name = "Value";
 		this->isDouble = true;
 		break;
 	case Tokens::MID:
-		this->name = "M";
+		this->name = "Matrix";
 		this->isString = true;
 		break;
+	case Tokens::NUL:
+		this->name = "Null";
+		break;
 	case Tokens::FID: 
-		this->name = "F";
+		this->name = "Function";
 		this->isString = true;
 		break;
 	}
@@ -67,7 +70,9 @@ Token::~Token()
 }
 
 // Functions
-std::string Token::string() const
+std::string Token::string(const bool fullName) const
 {
-	return this->name + ((isString) ? (":" + sValue) : "") + ((isDouble) ? (":" + std::to_string(dValue)) : "") + " ";
+	return ((fullName) ? this->name : this->name.substr(0, 1))
+		+ ((isString) ? (":" + sValue) : "")
+		+ ((isDouble) ? (":" + std::to_string(dValue)) : "") + " ";
 }

@@ -1,8 +1,9 @@
 #pragma once
 #include<iostream>
-#include<stack>
 #include<string>
 #include<vector>
+#include<stack>
+#include<cmath>
 #include"User.h"
 #include"Tokens.h"
 
@@ -22,12 +23,17 @@ private:
 		ERROR,
 		LEXING,
 		SHUNTING,
-		PARSING
+		EVALUATING,
+		COMPLETE
 	};
 
 	ParsingState parsingState;
 
 	std::string errorString;
+
+	double dResult;
+	MatrixContainer mResult;
+	bool bResIsMatrix;
 
 	// Lexing
 	std::string expression;
@@ -41,6 +47,9 @@ private:
 	std::deque<Token*> outQueue;
 	int tokenIter;
 
+	// Evaluating
+	std::stack<Token*> evalStack;
+
 	// Functions
 	int findMatrix(std::string& name) const;
 	bool isIn(const char& a, const std::string& s) const;
@@ -53,10 +62,15 @@ private:
 	void nextToken();
 	void shuntToQueue();
 
+	void moveQueue();
+	void evaluate();
+
 public:
 	// Functions
 	void parse();
-	bool error();
+	const bool error() const;
+	const bool complete() const;
+	const bool resIsMatrix() const;
 	std::string& getError();
 };
 

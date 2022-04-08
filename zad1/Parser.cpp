@@ -7,6 +7,9 @@ Parser::Parser(User* user, std::string expression)
 
 	this->parsingState = ParsingState::LEXING;
 
+	this->dResult = 0;
+	this->bResIsMatrix = false;
+
 	this->expression = expression;
 	this->charIter = 0;
 
@@ -67,6 +70,10 @@ void Parser::createWordToken()
 	{
 		if (s == this->functions[i])
 		{
+			if (!this->tokens.empty()
+				&& this->tokens.back()->type == Token::Tokens::VAL)
+				this->tokens.push_back(new Token(Token::Tokens::MUL));
+
 			this->tokens.push_back(new Token(Token::Tokens::FID));
 			this->tokens.back()->sValue = s;
 			return;
@@ -85,6 +92,10 @@ void Parser::createWordToken()
 		this->tokens.back()->dValue = 2.71828182;
 		return;
 	}
+
+	if (!this->tokens.empty()
+		&& this->tokens.back()->type == Token::Tokens::VAL)
+		this->tokens.push_back(new Token(Token::Tokens::MUL));
 
 	this->tokens.push_back(new Token(Token::Tokens::MID));
 	this->tokens.back()->sValue = s;
@@ -131,11 +142,17 @@ void Parser::createTokens()
 			this->createValueToken();
 		else if (this->expression[this->charIter] == '+')
 		{
+			if (this->tokens.empty() || this->tokens.back()->type == Token::Tokens::OPP)
+				this->tokens.push_back(new Token(Token::Tokens::NUL));
+
 			this->tokens.push_back(new Token(Token::Tokens::ADD));
 			this->nextChar();
 		}
 		else if (this->expression[this->charIter] == '-')
 		{
+			if (this->tokens.empty() || this->tokens.back()->type == Token::Tokens::OPP)
+				this->tokens.push_back(new Token(Token::Tokens::NUL));
+
 			this->tokens.push_back(new Token(Token::Tokens::SUB));
 			this->nextChar();
 		}
@@ -156,6 +173,11 @@ void Parser::createTokens()
 		}
 		else if (this->expression[this->charIter] == '(')
 		{
+			if (!this->tokens.empty()
+				&& (this->tokens.back()->type == Token::Tokens::VAL
+					|| this->tokens[this->tokens.size() - 1]->type == Token::Tokens::MID))
+				this->tokens.push_back(new Token(Token::Tokens::MUL));
+
 			this->tokens.push_back(new Token(Token::Tokens::OPP));
 			this->nextChar();
 		}
@@ -187,7 +209,7 @@ void Parser::nextToken()
 	if (this->tokenIter < this->tokens.size() - 1)
 		tokenIter++;
 	else
-		this->parsingState = ParsingState::PARSING;
+		this->parsingState = ParsingState::EVALUATING;
 }
 
 void Parser::shuntToQueue()
@@ -195,7 +217,8 @@ void Parser::shuntToQueue()
 	while (this->parsingState == ParsingState::SHUNTING)
 	{
 		if (this->tokens[this->tokenIter]->type == Token::Tokens::VAL
-			|| this->tokens[this->tokenIter]->type == Token::Tokens::MID)
+			|| this->tokens[this->tokenIter]->type == Token::Tokens::MID
+			|| this->tokens[this->tokenIter]->type == Token::Tokens::NUL)
 		{
 			this->outQueue.push_back(this->tokens[this->tokenIter]);
 			this->nextToken();
@@ -251,7 +274,7 @@ void Parser::shuntToQueue()
 				if (this->opStack.empty())	
 				{
 					this->parsingState = ParsingState::ERROR;
-					this->errorString = "Syntax Error: Mismatched Parentheses" + this->tokens[this->tokenIter]->string();
+					this->errorString = "Syntax Error: Mismatched Parentheses";
 					return;
 				}
 			}
@@ -266,7 +289,7 @@ void Parser::shuntToQueue()
 		else
 		{
 			this->parsingState = ParsingState::ERROR;
-			this->errorString = "Parsing Error: Invalid Token " + this->tokens[this->tokenIter]->string();
+			this->errorString = "Parsing Error: Invalid Token: " + this->tokens[this->tokenIter]->string(true);
 			return;
 		}
 	}
@@ -281,8 +304,248 @@ void Parser::shuntToQueue()
 	}
 	while (!this->opStack.empty())
 	{
-		this->outQueue.push_back(this->opStack.top());
-		this->opStack.pop();
+		if(this->opStack.top()->type != Token::Tokens::OPP)
+		{	
+			this->outQueue.push_back(this->opStack.top());
+			this->opStack.pop();
+		}
+		else
+		{
+			this->parsingState = ParsingState::ERROR;
+			this->errorString = "Syntax Error: Mismatched Parentheses";
+			return;
+		}
+	}
+}
+
+void Parser::moveQueue()
+{
+	if (!this->outQueue.empty())
+	{
+		this->evalStack.push(this->outQueue[0]);
+		this->outQueue.pop_front();
+	}
+	else if (this->parsingState != ParsingState::ERROR)
+	{
+		this->parsingState = ParsingState::COMPLETE;
+	}
+}
+
+void Parser::evaluate()
+{
+	this->moveQueue();
+
+	while (this->parsingState == ParsingState::EVALUATING)
+	{
+		if (this->evalStack.top()->type == Token::Tokens::VAL
+			|| this->evalStack.top()->type == Token::Tokens::MID
+			|| this->evalStack.top()->type == Token::Tokens::NUL)
+		{
+			moveQueue();
+		}
+		else if (this->evalStack.top()->type == Token::Tokens::ADD
+			|| this->evalStack.top()->type == Token::Tokens::SUB)
+		{
+			if (this->evalStack.size() >= 3)
+			{
+				Token* op3 = this->evalStack.top();
+				this->evalStack.pop();
+				Token* op2 = this->evalStack.top();
+				this->evalStack.pop();
+				Token* op1 = this->evalStack.top();
+				this->evalStack.pop();
+
+				if (op2->type == Token::Tokens::VAL
+					&& (op1->type == Token::Tokens::VAL)
+					|| op1->type == Token::Tokens::NUL)
+				{
+					if (op1->type == Token::Tokens::NUL)
+					{
+						op1->type = Token::Tokens::VAL;
+						op1->isDouble = true;
+					}
+
+					this->tokens.push_back(new Token(Token::Tokens::VAL));
+					if (op3->type == Token::Tokens::ADD)
+						this->tokens.back()->dValue = op1->dValue + op2->dValue;
+					else if (op3->type == Token::Tokens::SUB)
+						this->tokens.back()->dValue = op1->dValue - op2->dValue;
+					this->evalStack.push(this->tokens.back());
+				}
+				else if (op2->type == Token::Tokens::MID
+					&& (op1->type == Token::Tokens::MID
+					|| op1->type == Token::Tokens::NUL))
+				{
+					; // Add Matrices
+				}
+				else
+				{
+					this->parsingState = ParsingState::ERROR;
+					this->errorString = "Evaluation Error: Undefined Addition/Subtraction Operation For: " 
+						+ op1->string(true) + "& " + op2->string(true);
+					return;
+				}
+			}
+			else 
+			{
+				this->parsingState = ParsingState::ERROR;
+				this->errorString = "Evaluation Error: Missing Operands For Addition/Subtraction Operation";
+				return;
+			}
+
+			moveQueue();
+		} 
+		else if (this->evalStack.top()->type == Token::Tokens::MUL)
+		{
+			if (this->evalStack.size() >= 3)
+			{
+				this->evalStack.pop();
+				Token* op2 = this->evalStack.top();
+				this->evalStack.pop();
+				Token* op1 = this->evalStack.top();
+				this->evalStack.pop();
+
+				if (op2->type == Token::Tokens::VAL
+					&& op1->type == Token::Tokens::VAL)
+				{
+					this->tokens.push_back(new Token(Token::Tokens::VAL));
+					this->tokens.back()->dValue = op1->dValue * op2->dValue;
+					this->evalStack.push(this->tokens.back());
+				}
+				else if ((op2->type == Token::Tokens::MID
+					&& op1->type == Token::Tokens::VAL)
+					|| (op2->type == Token::Tokens::VAL
+					&& op1->type == Token::Tokens::MID))
+				{
+					; // Matrix Scalar Mul
+				}
+				else if (op2->type == Token::Tokens::MID
+					&& op1->type == Token::Tokens::MID)
+				{
+					; // Dot Product
+				}
+				else
+				{
+					this->parsingState = ParsingState::ERROR;
+					this->errorString = "Evaluation Error: Undefined Multiplication Operation For: "
+						+ op1->string(true) + "& " + op2->string(true);
+					return;
+				}
+			}
+			else
+			{
+				this->parsingState = ParsingState::ERROR;
+				this->errorString = "Evaluation Error: Missing Operands For Multiplication Operation";
+				return;
+			}
+
+			moveQueue();
+		}
+		else if (this->evalStack.top()->type == Token::Tokens::DIV)
+		{
+		if (this->evalStack.size() >= 3)
+		{
+			this->evalStack.pop();
+			Token* op2 = this->evalStack.top();
+			this->evalStack.pop();
+			Token* op1 = this->evalStack.top();
+			this->evalStack.pop();
+
+			if (op2->type == Token::Tokens::VAL
+				&& op1->type == Token::Tokens::VAL)
+			{
+				this->tokens.push_back(new Token(Token::Tokens::VAL));
+				this->tokens.back()->dValue = op1->dValue / op2->dValue;
+				this->evalStack.push(this->tokens.back());
+			}
+			else if (op2->type == Token::Tokens::MID
+				&& op1->type == Token::Tokens::VAL)
+			{
+				; // Matrix Scalar Div
+			}
+			else
+			{
+				this->parsingState = ParsingState::ERROR;
+				this->errorString = "Evaluation Error: Undefined Division Operation For: "
+					+ op1->string(true) + "& " + op2->string(true);
+				return;
+			}
+		}
+		else
+		{
+			this->parsingState = ParsingState::ERROR;
+			this->errorString = "Evaluation Error: Missing Operands For Division Operation";
+			return;
+		}
+
+		moveQueue();
+		}
+		else if (this->evalStack.top()->type == Token::Tokens::POW)
+		{
+		if (this->evalStack.size() >= 3)
+		{
+			this->evalStack.pop();
+			Token* op2 = this->evalStack.top();
+			this->evalStack.pop();
+			Token* op1 = this->evalStack.top();
+			this->evalStack.pop();
+
+			if (op2->type == Token::Tokens::VAL
+				&& op1->type == Token::Tokens::VAL)
+			{
+				this->tokens.push_back(new Token(Token::Tokens::VAL));
+				this->tokens.back()->dValue = pow(op1->dValue, op2->dValue);
+				this->evalStack.push(this->tokens.back());
+			}
+			else if (op2->type == Token::Tokens::VAL
+				&& op1->type == Token::Tokens::MID)
+			{
+				; // Matrix To Power
+			}
+			else
+			{
+				this->parsingState = ParsingState::ERROR;
+				this->errorString = "Evaluation Error: Undefined Power Operation For: "
+					+ op1->string(true) + "& " + op2->string(true);
+				return;
+			}
+		}
+		else
+		{
+			this->parsingState = ParsingState::ERROR;
+			this->errorString = "Evaluation Error: Missing Operands For Power Operation";
+			return;
+		}
+
+		moveQueue();
+		}
+		else
+		{
+			this->parsingState = ParsingState::ERROR;
+			this->errorString = "Evaluation Error: Invalid Token: " + this->evalStack.top()->string(true);
+			return;
+		}
+	}
+
+	if (this->parsingState == ParsingState::COMPLETE
+		&& this->evalStack.size() == 1 
+		&& this->evalStack.top()->type == Token::Tokens::VAL)
+	{
+		this->bResIsMatrix = false;
+		this->dResult = this->evalStack.top()->dValue;
+	}
+	else if (this->parsingState == ParsingState::COMPLETE
+		&& this->evalStack.size() == 1
+		&& this->evalStack.top()->type == Token::Tokens::MID)
+	{
+		this->bResIsMatrix = true;
+		//this->mResult = this->evalStack.top()->dValue;
+	}
+	else if (this->parsingState != ParsingState::ERROR)
+	{
+		this->parsingState = ParsingState::ERROR;
+		this->errorString = "Evaluation Error: Missing Operator";
+		return;
 	}
 }
 
@@ -310,15 +573,32 @@ void Parser::parse()
 	}
 	s2 << "\n";
 	std::cout << s2.str();
+
+	system("PAUSE");
+
+	evaluate();
+
+	if (this->parsingState != ParsingState::ERROR)
+		std::cout << "\n" << std::to_string(this->dResult) << "\n";
 }
 
-bool Parser::error()
+const bool Parser::error() const
 {
 	return this->parsingState == ParsingState::ERROR;
+}
+
+const bool Parser::complete() const
+{
+	return this->parsingState == ParsingState::COMPLETE;
+}
+
+const bool Parser::resIsMatrix() const
+{
+	return this->bResIsMatrix;
 }
 
 std::string& Parser::getError()
 {
 	return this->errorString;
 }
- 
+
