@@ -39,7 +39,11 @@ private:
 	std::string expression;
 	int charIter;
 	const std::string operators = "+-*/^(),";
-	const std::vector<std::string> functions = { "sin", "cos", "abs", "max" };
+	const std::vector<std::string> functions = { "sin", "cos", "tan", "tg", "ctg", 
+		"asin", "arcsin", "acos", "arccos", "atan", "arctg", "arcctg",
+		"sqrt", "cbrt", "abs", 
+		"exp", "ln", "lg",
+		"pow", "log", "max", "min"};
 	std::vector<Token*> tokens;
 
 	// Shunting
@@ -63,6 +67,7 @@ private:
 	void shuntToQueue();
 
 	void moveQueue();
+	void evalFunc();
 	void evaluate();
 
 public:
@@ -71,6 +76,8 @@ public:
 	const bool error() const;
 	const bool complete() const;
 	const bool resIsMatrix() const;
+	double getDoubleResult();
+	MatrixContainer getMatrixResult();
 	std::string& getError();
 };
 
