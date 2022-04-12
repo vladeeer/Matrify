@@ -82,12 +82,20 @@ void Parser::createWordToken()
 	
 	if (s == "pi" || s == "PI")
 	{
+		if (!this->tokens.empty()
+			&& this->tokens.back()->type == Token::Tokens::VAL)
+			this->tokens.push_back(new Token(Token::Tokens::MUL));
+
 		this->tokens.push_back(new Token(Token::Tokens::VAL));
 		this->tokens.back()->dValue = 3.14159265;
 		return;
 	}
 	else if (s == "e")
 	{
+		if (!this->tokens.empty()
+			&& this->tokens.back()->type == Token::Tokens::VAL)
+			this->tokens.push_back(new Token(Token::Tokens::MUL));
+
 		this->tokens.push_back(new Token(Token::Tokens::VAL));
 		this->tokens.back()->dValue = 2.71828182;
 		return;
@@ -142,7 +150,8 @@ void Parser::createTokens()
 			this->createValueToken();
 		else if (this->expression[this->charIter] == '+')
 		{
-			if (this->tokens.empty() || this->tokens.back()->type == Token::Tokens::OPP)
+			if (this->tokens.empty() || this->tokens.back()->type == Token::Tokens::OPP
+				|| this->tokens.back()->type == Token::Tokens::COM)
 				this->tokens.push_back(new Token(Token::Tokens::NUL));
 
 			this->tokens.push_back(new Token(Token::Tokens::ADD));
@@ -150,7 +159,8 @@ void Parser::createTokens()
 		}
 		else if (this->expression[this->charIter] == '-')
 		{
-			if (this->tokens.empty() || this->tokens.back()->type == Token::Tokens::OPP)
+			if (this->tokens.empty() || this->tokens.back()->type == Token::Tokens::OPP
+				|| this->tokens.back()->type == Token::Tokens::COM)
 				this->tokens.push_back(new Token(Token::Tokens::NUL));
 
 			this->tokens.push_back(new Token(Token::Tokens::SUB));
@@ -175,7 +185,7 @@ void Parser::createTokens()
 		{
 			if (!this->tokens.empty()
 				&& (this->tokens.back()->type == Token::Tokens::VAL
-					|| this->tokens[this->tokens.size() - 1]->type == Token::Tokens::MID))
+				|| this->tokens.back()->type == Token::Tokens::MID))
 				this->tokens.push_back(new Token(Token::Tokens::MUL));
 
 			this->tokens.push_back(new Token(Token::Tokens::OPP));
@@ -331,6 +341,91 @@ void Parser::moveQueue()
 	}
 }
 
+void Parser::evalFunc()
+{
+	std::string FID = this->evalStack.top()->sValue;
+	this->evalStack.pop();
+
+	int nArgs = 0;
+	if (FID == "sin" || FID == "cos" || FID == "tan" || FID == "tg" || FID == "ctg" 
+		|| FID == "asin" || FID == "arcsin" || FID == "acos" || FID == "arccos" 
+		|| FID == "atan" || FID == "arctg" || FID == "arcctg"
+		|| FID == "sqrt" || FID == "cbrt" || FID == "abs" 
+		|| FID == "exp" || FID == "ln" || FID == "lg")
+		nArgs = 1;
+	else if (FID == "pow" || FID == "log" || FID == "max" || FID == "min")
+		nArgs = 2;
+	else
+	{
+		this->parsingState = ParsingState::ERROR;
+		this->errorString = "Evaluation Error: Invalid Function: " + FID + "()";
+		return;
+	}
+
+	if (this->evalStack.size() >= nArgs)
+	{
+		double args[2];
+		for (int i = 0; i < nArgs; i++)
+		{
+			if (this->evalStack.top()->type == Token::Tokens::VAL)
+				args[nArgs - 1 - i] = this->evalStack.top()->dValue;
+			else
+			{
+				this->parsingState = ParsingState::ERROR;
+				this->errorString = "Evaluation Error: Invalid Arguments For Function: " + FID + "()";
+				return;
+			}
+			this->evalStack.pop();
+		}
+
+		double res = 0;
+		if (FID == "sin")
+			res = sin(args[0]);
+		else if (FID == "cos")
+			res = cos(args[0]);
+		else if (FID == "tan" || FID == "tg")
+			res = tan(args[0]);
+		else if (FID == "ctg")
+			res = 1 / tan(args[0]);
+		else if (FID == "asin" || FID == "arcsin")
+			res = asin(args[0]);
+		else if (FID == "acos" || FID == "arccos")
+			res = acos(args[0]);
+		else if (FID == "ctg")
+			res = 1 / tan(args[0]);
+		else if (FID == "atan" || FID == "arctg")
+			res = atan(args[0]);
+		else if (FID == "arcctg")
+			res = atan(1 / args[0]);
+		else if (FID == "arcctg")
+			res = atan(1 / args[0]);
+		else if (FID == "exp")
+			res = exp(args[0]);
+		else if (FID == "ln")
+			res = log(args[0]);
+		else if (FID == "lg")
+			res = log10(args[0]);
+		else if (FID == "pow")
+			res = pow(args[0], args[1]);
+		else if (FID == "log")
+			res = log(args[1]) / log(args[0]);
+		else if (FID == "max")
+			res = (args[0] > args[1]) ? args[0] : args[1];
+		else if (FID == "min")
+			res = (args[0] < args[1]) ? args[0] : args[1];
+
+
+		this->tokens.push_back(new Token(Token::Tokens::VAL));
+		this->tokens.back()->dValue = res;
+		this->evalStack.push(this->tokens.back());
+	}
+	else
+	{
+		this->parsingState = ParsingState::ERROR;
+		this->errorString = "Evaluation Error: Missing Function Arguments For: " + FID + "()";
+	}
+}
+
 void Parser::evaluate()
 {
 	this->moveQueue();
@@ -341,6 +436,14 @@ void Parser::evaluate()
 			|| this->evalStack.top()->type == Token::Tokens::MID
 			|| this->evalStack.top()->type == Token::Tokens::NUL)
 		{
+			moveQueue();
+		}
+		else if (this->evalStack.top()->type == Token::Tokens::FID)
+		{
+			evalFunc();
+			if (this->parsingState == ParsingState::ERROR)
+				return;
+
 			moveQueue();
 		}
 		else if (this->evalStack.top()->type == Token::Tokens::ADD
@@ -555,7 +658,7 @@ void Parser::parse()
 	createTokens();
 
 	std::stringstream s1;
-	s1 << "\n";
+	s1 << "Original: ";
 	for (int i = 0; i < this->tokens.size(); i++)
 	{
 		s1 << this->tokens[i]->string();
@@ -566,7 +669,7 @@ void Parser::parse()
 	shuntToQueue();
 
 	std::stringstream s2;
-	s2 << "Out: ";
+	s2 << "Polish:   ";
 	for (int i = 0; i < this->outQueue.size(); i++)
 	{
 		s2 << this->outQueue[i]->string();
@@ -595,6 +698,16 @@ const bool Parser::complete() const
 const bool Parser::resIsMatrix() const
 {
 	return this->bResIsMatrix;
+}
+
+double Parser::getDoubleResult()
+{
+	return this->dResult;
+}
+
+MatrixContainer Parser::getMatrixResult()
+{
+	return this->mResult;
 }
 
 std::string& Parser::getError()
