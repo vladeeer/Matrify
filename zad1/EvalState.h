@@ -19,6 +19,7 @@ private:
 	User* user;
 
 	std::string expression;
+	std::string result;
 	int cursorPos;
 
 public:

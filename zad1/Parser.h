@@ -31,10 +31,6 @@ private:
 
 	std::string errorString;
 
-	double dResult;
-	MatrixContainer mResult;
-	bool bResIsMatrix;
-
 	// Lexing
 	std::string expression;
 	int charIter;
@@ -43,7 +39,8 @@ private:
 		"asin", "arcsin", "acos", "arccos", "atan", "arctg", "arcctg",
 		"sqrt", "cbrt", "abs", 
 		"exp", "ln", "lg",
-		"pow", "log", "max", "min"};
+		"pow", "log", "max", "min",
+		"inverse", "det"};
 	std::vector<Token*> tokens;
 
 	// Shunting
@@ -53,9 +50,13 @@ private:
 
 	// Evaluating
 	std::stack<Token*> evalStack;
+	std::stack<MatrixContainer*> matrixStack;
+	double dResult;
+	Matrix<double> mResult;
+	bool bResIsMatrix;
 
 	// Functions
-	int findMatrix(std::string& name) const;
+	Matrix<double> getMatrix(std::string name = "");
 	bool isIn(const char& a, const std::string& s) const;
 
 	void nextChar();
@@ -77,7 +78,7 @@ public:
 	const bool complete() const;
 	const bool resIsMatrix() const;
 	double getDoubleResult();
-	MatrixContainer getMatrixResult();
+	Matrix<double> getMatrixResult();
 	std::string& getError();
 };
 

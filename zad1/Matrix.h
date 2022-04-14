@@ -8,6 +8,7 @@ class Matrix
 public: 
 	// Constructors/Destructors
 	Matrix(const int height, const int width);
+	Matrix();
 	Matrix(const Matrix<T>& m);
 	~Matrix();
 
@@ -51,8 +52,8 @@ public:
 	void add(const Matrix<T>& m);
 	void sub(const Matrix<T>& m);
 	void dot(const Matrix<T>& m);
-	void mul(const int n);
-	void div(const int n);
+	void mul(const T n);
+	void div(const T n);
 
 	std::string string(const std::string linePrefix = "  ", const int printSize = -1) const;
 	std::string elementString(const int row, const int col, const int printSize = -1) const;
@@ -64,10 +65,10 @@ public:
 	Matrix<T> operator+(const Matrix<T>& m) const;
 	Matrix<T> operator-(const Matrix<T>& m) const;
 	Matrix<T> operator*(const Matrix<T>& m) const;
-	Matrix<T> operator*(const int& n) const;
-	Matrix<T> operator/(const int& n) const;
+	Matrix<T> operator*(const T& n) const;
+	Matrix<T> operator/(const T& n) const;
 };
 
 template<typename T>
-Matrix<T> operator*(const int& n, Matrix<T>& m);
+Matrix<T> operator*(const T& n, Matrix<T>& m);
 

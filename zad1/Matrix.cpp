@@ -17,6 +17,12 @@ Matrix<T>::Matrix(const int height, const int width)
 }
 
 template<typename T>
+Matrix<T>::Matrix() :Matrix<T>(0,0)
+{
+
+}
+
+template<typename T>
 Matrix<T>::Matrix(const Matrix<T>& m) :Matrix<T>(m.getHeight(), m.getWidth()) 
 {
 	// Copy Constructor
@@ -281,7 +287,7 @@ void Matrix<T>::dot(const Matrix<T>& m)
 }
 
 template<typename T>
-void Matrix<T>::mul(const int n)
+void Matrix<T>::mul(const T n)
 {
 	// Multiply by scalar
 	for (int i = 0; i < size; i++)
@@ -289,7 +295,7 @@ void Matrix<T>::mul(const int n)
 }
 
 template<typename T>
-void Matrix<T>::div(const int n)
+void Matrix<T>::div(const T n)
 {
 	// Divide by scalar
 	for (int i = 0; i < size; i++)
@@ -395,7 +401,7 @@ Matrix<T> Matrix<T>::operator*(const Matrix<T>& m) const
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::operator*(const int& n) const
+Matrix<T> Matrix<T>::operator*(const T& n) const
 {
 	Matrix<T> res(*this);
 	res.mul(n);
@@ -403,7 +409,7 @@ Matrix<T> Matrix<T>::operator*(const int& n) const
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::operator/(const int& n) const
+Matrix<T> Matrix<T>::operator/(const T& n) const
 {
 	Matrix<T> res(*this);
 	res.div(n);
@@ -411,7 +417,7 @@ Matrix<T> Matrix<T>::operator/(const int& n) const
 }
 
 template<typename T>
-Matrix<T> operator*(const int& n, Matrix<T>& m)
+Matrix<T> operator*(const T& n, Matrix<T>& m)
 {
 	// Multiply scalar by matrix
 	Matrix<T> res(m);
@@ -426,3 +432,4 @@ Matrix<T> operator*(const int& n, Matrix<T>& m)
 //template class Matrix<long long>;
 //template class Matrix<float>;
 template class Matrix<double>;
+template Matrix<double> operator*(const double& n, Matrix<double>& m);
