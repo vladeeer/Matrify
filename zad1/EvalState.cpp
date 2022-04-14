@@ -8,6 +8,7 @@ EvalState::EvalState(
 	this->user = user;
 
 	this->expression = "3+4*2/(1-5)^2^3";
+	this->result = "";
 	this->cursorPos = (int)this->expression.length();
 }
 
@@ -50,6 +51,9 @@ void EvalState::printMenu() const
 
 	cursorLine.append("\n");
 	ss << cursorLine;
+
+	ss 
+		<< this->result << "\n";
 
 	std::cout << ss.str();
 }
@@ -97,9 +101,17 @@ void EvalState::updateMenu()
 			Parser parser(this->user, this->expression);
 			parser.parse();
 			if (!parser.error())
-				system("PAUSE");
+			{
+				if (parser.resIsMatrix())
+					this->result = parser.getMatrixResult().string();
+				else
+					this->result = std::to_string(parser.getDoubleResult());
+			}
 			else
+			{
+				this->result = "";
 				this->states->push(new ErrorState(parser.getError()));
+			}
 			quitLoop = true;
 		}
 		else if ((95 <= choice && choice <= 122)
