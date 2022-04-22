@@ -303,6 +303,104 @@ void Matrix<T>::div(const T n)
 }
 
 template<typename T>
+T Matrix<T>::det()
+{
+	T det = 0;
+	int n = this->getHeight();
+
+	if (n == 1)
+		return this->at(0, 0);
+
+	for (int i = 0; i < n; i++)
+	{
+		Matrix<T> temp(n - 1, n - 1);
+		T tempDet = 0;
+		temp.initWithZeros();
+		
+		for (int row = 1; row < n; row++)
+			for (int col = 0; col < n; col++)
+			{
+				if (col < i)
+					temp.at(row - 1, col) = this->at(row, col);
+				else if (col > i)
+					temp.at(row - 1, col - 1) = this->at(row, col);
+			}
+
+		tempDet = temp.det();
+		tempDet *= this->at(0, i);
+		if (i % 2 != 0)
+			tempDet *= -1;
+		det += tempDet;
+	}
+
+	return det;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::trans()
+{
+	Matrix<T> res(this->width, this->height);
+
+	for (int row = 0; row < this->height; row++)
+		for (int col = 0; col < this->width; col++)
+			res.at(col, row) = this->at(row, col);
+
+	return res;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::adj()
+{
+	Matrix<T> res(this->getHeight(), this->getWidth());
+	res.initWithZeros();
+
+	if (this->getHeight() == 1 && this->getWidth() == 1)
+	{
+		res.at(0, 0) = 1;
+		return res;
+	}
+
+	for (int i = 0; i < this->getHeight(); i++)
+	{
+		for (int j = 0; j < this->getWidth(); j++)
+		{
+			Matrix<T> temp(this->getHeight() - 1, this->getWidth() - 1);
+			temp.initWithZeros();
+
+			for (int row = 0; row < this->getHeight(); row++)
+				for (int col = 0; col < this->getWidth(); col++)
+				{
+					if (row < i && col < j)
+						temp.at(row, col) = this->at(row, col);
+					else if (row > i && col < j)
+						temp.at(row - 1, col) = this->at(row, col);
+					else if (row < i && col > j)
+						temp.at(row, col - 1) = this->at(row, col);
+					else if (row > i && col > j)
+						temp.at(row - 1, col - 1) = this->at(row, col);
+				}
+
+			T tempDet = temp.det();
+			if ((j + i) % 2 != 0)
+				tempDet *= -1;
+			res.at(i, j) = tempDet;
+		}
+	}
+
+	res = res.trans();
+
+	return res;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::inv()
+{
+	Matrix<T> res = this->adj();
+	res = res / this->det();
+	return res;
+}
+
+template<typename T>
 std::string Matrix<T>::string(const std::string linePrefix, const int printSize) const
 {
 	// Printable result

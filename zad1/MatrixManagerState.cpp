@@ -20,7 +20,7 @@ void MatrixManagerState::printMenu()
 	
 	this->setTotalOptions(this->user->getnMatrices() + 2);
 
-	ss << " <======== Matrix Manager ========>" << "\n" << "\n";
+	ss << " <======== Matrix Manager  ========>" << "\n" << "\n";
 
 	std::vector<std::string> options(this->user->getMaxMatrices()+2LL);
 	options[this->user->getMaxMatrices()] = "Create New Matrix"; 
@@ -40,11 +40,11 @@ void MatrixManagerState::printMenu()
 			<< "/" << std::to_string(this->user->getMaxMatrices())
 			<< " Matrices Stored" << "\n" << "\n";
 
-		ss << "-----------------------------------" << "\n";
+		ss << "------------------------------------" << "\n";
 
 		ss << getOptionsString(options.data(), this->user->getnMatrices());
 
-		ss << "-----------------------------------" << "\n" << "\n";
+		ss << "------------------------------------" << "\n" << "\n";
 	}
 	else
 	{

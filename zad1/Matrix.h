@@ -54,6 +54,10 @@ public:
 	void dot(const Matrix<T>& m);
 	void mul(const T n);
 	void div(const T n);
+	T det();
+	Matrix<T> trans();
+	Matrix<T> adj();
+	Matrix<T> inv();
 
 	std::string string(const std::string linePrefix = "  ", const int printSize = -1) const;
 	std::string elementString(const int row, const int col, const int printSize = -1) const;

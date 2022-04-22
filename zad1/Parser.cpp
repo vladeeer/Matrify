@@ -369,7 +369,7 @@ void Parser::evalFunc()
 		|| FID == "atan" || FID == "arctg" || FID == "arcctg"
 		|| FID == "sqrt" || FID == "cbrt" || FID == "abs" 
 		|| FID == "exp" || FID == "ln" || FID == "lg" 
-		|| FID == "inverse" || FID == "det")
+		|| FID == "trans" || FID == "adj" || FID == "inv" || FID == "det")
 		nArgs = 1;
 	else if (FID == "pow" || FID == "log" || FID == "max" || FID == "min")
 		nArgs = 2;
@@ -379,7 +379,7 @@ void Parser::evalFunc()
 		this->errorString = "Evaluation Error: Invalid Function: " + FID + "()";
 		return;
 	}
-	if (FID == "inverse" || FID == "det")
+	if (FID == "trans" || FID == "adj" || FID == "inv" || FID == "det")
 	{
 		if (this->evalStack.size() >= nArgs) //nArgs=1
 		{
@@ -409,14 +409,48 @@ void Parser::evalFunc()
 						+ std::to_string(arg.getHeight()) + "x" + std::to_string(arg.getWidth()) + ")";
 					return;
 				}
+
 				double res;
 				res = 0;
-				//res = arg.det();
+				res = arg.det();
 				this->tokens.push_back(new Token(Token::Tokens::VAL));
 				this->tokens.back()->dValue = res;
 				this->evalStack.push(this->tokens.back());
 			}
-			else 
+			else if (FID == "trans")
+			{
+				Matrix<double> res;
+				res = arg.trans();
+				this->tokens.push_back(new Token(Token::Tokens::MID));
+				this->tokens.back()->sValue = "";
+				this->evalStack.push(this->tokens.back());
+				matrixStack.push(new MatrixContainer(res, ""));
+			}
+			else if (FID == "adj")
+			{
+				if (arg.getHeight() != arg.getWidth())
+				{
+					this->parsingState = ParsingState::ERROR;
+					this->errorString = "Evaluation Error: Cannot Find Adjugate Of A Non-Square Matrix: adj("
+						+ std::to_string(arg.getHeight()) + "x" + std::to_string(arg.getWidth()) + ")";
+					return;
+				}
+				if (arg.det() == 0)
+				{
+					this->parsingState = ParsingState::ERROR;
+					this->errorString = "Evaluation Error: Cannot Find Adjugate Of A Matrix With Zero Determinant: adj("
+						+ std::to_string(arg.getHeight()) + "x" + std::to_string(arg.getWidth()) + ")";
+					return;
+				}
+
+				Matrix<double> res;
+				res = arg.adj();
+				this->tokens.push_back(new Token(Token::Tokens::MID));
+				this->tokens.back()->sValue = "";
+				this->evalStack.push(this->tokens.back());
+				matrixStack.push(new MatrixContainer(res, ""));
+			}
+			else if (FID == "inv")
 			{
 				if (arg.getHeight() != arg.getWidth())
 				{
@@ -425,8 +459,16 @@ void Parser::evalFunc()
 						+ std::to_string(arg.getHeight()) + "x" + std::to_string(arg.getWidth()) + ")";
 					return;
 				}
+				if (arg.det() == 0)
+				{
+					this->parsingState = ParsingState::ERROR;
+					this->errorString = "Evaluation Error: Cannot Find Inverse Of A Matrix With Zero Determinant: det("
+						+ std::to_string(arg.getHeight()) + "x" + std::to_string(arg.getWidth()) + ")";
+					return;
+				}
+
 				Matrix<double> res;
-				//res = arg.inverse();
+				res = arg.inv();
 				this->tokens.push_back(new Token(Token::Tokens::MID));
 				this->tokens.back()->sValue = "";
 				this->evalStack.push(this->tokens.back());
