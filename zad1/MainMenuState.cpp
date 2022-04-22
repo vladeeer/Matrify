@@ -5,7 +5,7 @@ MainMenuState::MainMenuState(
 	std::stack<State*>* states, User* user) : State()
 {
 	this->states = states;
-	this->setTotalOptions(4);
+	this->setTotalOptions(3);
 
 	this->user = user;
 
@@ -23,7 +23,7 @@ void MainMenuState::printMenu() const
 
 	ss << " <======== Main Menu ========>" << "\n" << "\n";
 
-	std::string options[4] = { "Evaluate Expression","Manage Stored Matrices","Settings","Quit"};
+	std::string options[3] = { "Evaluate Expression","Manage Stored Matrices","Quit"};
 	ss << getOptionsString(options); 
 
 	std::cout << ss.str();
@@ -68,8 +68,6 @@ void MainMenuState::updateMenu()
 				this->states->push(new MatrixManagerState(this->states, this->user));
 				break;
 			case 2:
-				break;
-			case 3:
 				// Quit
 				this->states->push(new ConfirmState(this->user, "Are You Sure You Want To Leave?", "Leave", "Stay"));
 				this->lastQuery = "Quit";

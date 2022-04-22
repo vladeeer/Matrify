@@ -9,7 +9,7 @@ User::User()
 	this->bConfirm = false;
 	//this->matrices.push_back(new MatrixContainer(3, 3, "A"));
 	//this->matrices.push_back(new MatrixContainer(1, 1, "Hi"));
-	this->matrices.push_back(new MatrixContainer(6, 3, "Jacobian"));
+	//this->matrices.push_back(new MatrixContainer(6, 3, "Jacobian"));
 }
 
 User::~User()

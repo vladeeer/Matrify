@@ -7,7 +7,7 @@ EvalState::EvalState(
 	this->states = states;
 	this->user = user;
 
-	this->expression = "3+4*2/(1-5)^2^3";
+	this->expression = "-1.5 + 2sin(7pi/6) + 4*max(1,2)/sqrt(5-1)^3 + ln(ln(1) + e^2)";
 	this->result = "";
 	this->cursorPos = (int)this->expression.length();
 }

@@ -40,7 +40,7 @@ private:
 		"sqrt", "cbrt", "abs", 
 		"exp", "ln", "lg",
 		"pow", "log", "max", "min",
-		"inverse", "det"};
+		"trans", "adj", "inv", "det"};
 	std::vector<Token*> tokens;
 
 	// Shunting
